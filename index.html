@@ -1,31 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Heart Animation</title>
     <style>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        /* CSS langsung di sini, tidak perlu file style.css */
-        body { margin: 0; overflow: hidden; background: #000; }
-        canvas { display: block; }
+        body { margin: 0; overflow: hidden; background: #000; touch-action: none; }
+        canvas { display: block; width: 100vw; height: 100vh; }
     </style>
 </head>
 <body>
     <canvas id="c"></canvas>
     <script>
-        /* JavaScript langsung di sini, tidak perlu file script.js */
         const canvas = document.getElementById('c');
         const a = canvas.getContext('2d');
-        let e = [], h = [], O = canvas.width = innerWidth, Q = canvas.height = innerHeight, v = 32, M = Math, R = M.random, C = M.cos, Y = 6.3, isPressed = false;
+        let e = [], h = [], O, Q, v = 32, M = Math, R = M.random, C = M.cos, Y = 6.3, isPressed = false;
 
-        for (i = 0; i < Y; i += .2) {
-            h.push([O / 2 + 180 * M.pow(M.sin(i), 3), Q / 2 + 10 * (-(15 * C(i) - 5 * C(2 * i) - 2 * C(3 * i) - C(4 * i)))]);
+        function updateSize() {
+            O = canvas.width = innerWidth;
+            Q = canvas.height = innerHeight;
+            h = [];
+            // Ukuran hati sedikit diperkecil (150) agar pas di HP portrait
+            let scale = O < 500 ? 120 : 180; 
+            for (let i = 0; i < Y; i += .2) {
+                h.push([
+                    O / 2 + scale * M.pow(M.sin(i), 3),
+                    Q / 2 + (scale/18) * (-(15 * C(i) - 5 * C(2 * i) - 2 * C(3 * i) - C(4 * i)))
+                ]);
+            }
         }
 
         function init() {
             e = [];
-            for (i = 0; i < v; i++) {
+            for (let i = 0; i < v; i++) {
                 let x = R() * O, y = R() * Q, H = i / v * 80 + 280, S = R() * 40 + 60, B = R() * 60 + 20, f = [];
-                for (k = 0; k < v; k++) {
+                for (let k = 0; k < v; k++) {
                     f[k] = { x: x, y: y, X: 0, Y: 0, R: (1 - k / v) + 1, S: R() + 1, q: ~~(R() * v), D: i % 2 * 2 - 1, F: R() * .2 + .7, f: "hsla(" + ~~H + "," + ~~S + "%," + ~~B + "%,.1)" };
                 }
                 e[i] = f;
@@ -65,11 +74,13 @@
             requestAnimationFrame(loop);
         }
 
+        window.addEventListener('resize', updateSize);
         window.addEventListener('mousedown', () => { resetParticles(); isPressed = true; });
         window.addEventListener('mouseup', () => isPressed = false);
         window.addEventListener('touchstart', (e) => { resetParticles(); isPressed = true; e.preventDefault(); }, { passive: false });
         window.addEventListener('touchend', () => isPressed = false);
 
+        updateSize();
         init();
         loop();
     </script>
