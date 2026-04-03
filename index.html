@@ -1,22 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+    <title>Heart Animation</title>
+    <style>
+        /* CSS langsung di sini, tidak perlu file style.css */
+        body { margin: 0; overflow: hidden; background: #000; }
+        canvas { display: block; }
+    </style>
 </head>
 <body>
-    <br>
-    <div id="obal">
     <canvas id="c"></canvas>
     <script>
-        var b = document.body;
-        var c = document.getElementsByTagName('canvas')[0];
-    var a = c.getContext('2d');
-    document.body.clientWidth;
+        /* JavaScript langsung di sini, tidak perlu file script.js */
+        const canvas = document.getElementById('c');
+        const a = canvas.getContext('2d');
+        let e = [], h = [], O = canvas.width = innerWidth, Q = canvas.height = innerHeight, v = 32, M = Math, R = M.random, C = M.cos, Y = 6.3, isPressed = false;
+
+        for (i = 0; i < Y; i += .2) {
+            h.push([O / 2 + 180 * M.pow(M.sin(i), 3), Q / 2 + 10 * (-(15 * C(i) - 5 * C(2 * i) - 2 * C(3 * i) - C(4 * i)))]);
+        }
+
+        function init() {
+            e = [];
+            for (i = 0; i < v; i++) {
+                let x = R() * O, y = R() * Q, H = i / v * 80 + 280, S = R() * 40 + 60, B = R() * 60 + 20, f = [];
+                for (k = 0; k < v; k++) {
+                    f[k] = { x: x, y: y, X: 0, Y: 0, R: (1 - k / v) + 1, S: R() + 1, q: ~~(R() * v), D: i % 2 * 2 - 1, F: R() * .2 + .7, f: "hsla(" + ~~H + "," + ~~S + "%," + ~~B + "%,.1)" };
+                }
+                e[i] = f;
+            }
+        }
+
+        function resetParticles() {
+            for (let j = 0; j < v; j++) {
+                let startX = R() * O, startY = R() * Q;
+                for (let k = 0; k < v; k++) { e[j][k].x = startX; e[j][k].y = startY; e[j][k].X = 0; e[j][k].Y = 0; }
+            }
+        }
+
+        function render(_) { a.fillStyle = _.f; a.beginPath(); a.arc(_.x, _.y, _.R, 0, Y, 1); a.fill(); }
+
+        function loop() {
+            a.fillStyle = "rgba(0,0,0,.2)";
+            a.fillRect(0, 0, O, Q);
+            if (isPressed) {
+                let i = v;
+                while (i--) {
+                    let f = e[i], u = f[0], q = h[u.q], dx = u.x - q[0], dy = u.y - q[1], dist = M.sqrt(dx * dx + dy * dy);
+                    if (dist < 10) {
+                        if (R() > .95) u.q = ~~(R() * v);
+                        else { if (R() > .99) u.D *= -1; u.q += u.D; u.q %= v; if (u.q < 0) u.q += v; }
+                    }
+                    u.X += -dx / dist * u.S; u.Y += -dy / dist * u.S; u.x += u.X; u.y += u.Y;
+                    render(u);
+                    u.X *= u.F; u.Y *= u.F;
+                    for (let k = 1; k < v; k++) {
+                        let T = f[k - 1], N = f[k];
+                        N.x -= (N.x - T.x) * .7; N.y -= (N.y - T.y) * .7;
+                        render(N);
+                    }
+                }
+            }
+            requestAnimationFrame(loop);
+        }
+
+        window.addEventListener('mousedown', () => { resetParticles(); isPressed = true; });
+        window.addEventListener('mouseup', () => isPressed = false);
+        window.addEventListener('touchstart', (e) => { resetParticles(); isPressed = true; e.preventDefault(); }, { passive: false });
+        window.addEventListener('touchend', () => isPressed = false);
+
+        init();
+        loop();
     </script>
-    </div>
-    <script src="script.js"></script>
 </body>
 </html>
